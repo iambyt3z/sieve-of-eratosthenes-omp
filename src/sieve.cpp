@@ -4,6 +4,7 @@ void
 mark_primes(std::vector<bool> &is_prime, int n)
 {
     long long i_limit = static_cast<long long>(ceil(sqrt(n)));
+    is_prime[0] = is_prime[1] = false;
 
     #pragma omp parallel for
     for(long long i=2; i <= i_limit; i++) {
@@ -13,6 +14,26 @@ mark_primes(std::vector<bool> &is_prime, int n)
         for(long long j=i*i; j<=n; j+=i)
             is_prime[j] = false;
     }
+}
+
+long long 
+get_first_prime_multiple_after_n(long long n, long long prime)
+{
+    long long first;
+
+    if(prime * prime >= n) {
+        first = prime * prime;
+    } 
+    
+    else {
+        if(n % prime == 0) {
+            first = n;
+        } else {
+            first = n + (prime - n % prime);
+        }
+    }
+
+    return first;
 }
 
 long long 
@@ -29,9 +50,7 @@ sieve
     long long res = 1LL;
 
     std::vector<bool> is_prime(n_sqrt+1, true);
-    is_prime[0] = is_prime[1] = false;
-    long long loop_limit = static_cast<long long>(ceil(sqrt(n_sqrt)));
-    mark_primes(is_prime, n_sqrt);
+    mark_primes(is_prime, n_sqrt); // Mark primes till sqrt(n)
 
     #pragma omp parallel // Mark primes from low_value to high_value
     {
@@ -46,23 +65,13 @@ sieve
         long long size = i_high_global - i_low_global + 1;
         std::vector<bool> is_prime_loc(size, true);
 
-        long long first;
-        long long curr_prime = 3LL;
+        for(long long curr_prime = 3LL; curr_prime * curr_prime <= val_high_global; curr_prime += 2)
+        {
+            if(!is_prime[curr_prime])
+                continue;
 
-        while(curr_prime * curr_prime <= val_high_global) {
-            if(curr_prime * curr_prime >= val_low_global) {
-                first = curr_prime * curr_prime;
-            } 
-            
-            else {
-                if(val_low_global % curr_prime == 0) {
-                    first = val_low_global;
-                } else {
-                    first = val_low_global + (curr_prime - val_low_global % curr_prime);
-                }
-            }
-            
-            #pragma omp for
+            long long first = get_first_prime_multiple_after_n(val_low_global, curr_prime);
+
             for(long long num_global = first; num_global <= val_high_global; num_global += curr_prime)
             {
                 if(num_global % 2 == 1)
@@ -72,24 +81,16 @@ sieve
                     is_prime_loc[num_ind_local] = false;
                 }
             }
-
-            curr_prime++;
-            while(!is_prime[curr_prime])
-                curr_prime++;
         }
 
         long long res_loc = 0LL;
-        
-        #pragma omp for
         for(int i=0; i<size; i++) 
         {
             res_loc += (long long) is_prime_loc[i];
         }
 
-        #pragma omp critical
-        {
-            res += res_loc;
-        }
+        #pragma omp atomic
+        res += res_loc;
     }
 
     return res;
