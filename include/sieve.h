@@ -4,7 +4,10 @@
 #include <iostream>
 #include <vector>
 #include <omp.h>
+#include <math.h>
+#include <climits>
 
-long long sieve(long long n) {};
+void mark_primes(std::vector<bool> &is_prime, int i_limit);
+long long sieve(long long n);
 
 #endif

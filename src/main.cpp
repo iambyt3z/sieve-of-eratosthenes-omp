@@ -9,5 +9,10 @@ int main(int argc, char *argv[]) {
     long long n = std::atoll(argv[1]);  
     std::cout << "n = " << n << '\n';
 
+    omp_set_num_threads(1);
+    long long res = sieve(n);
+
+    std::cout << "Number of primes = " << res << std::endl;
+
     return 0;
 }
