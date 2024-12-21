@@ -1,4 +1,4 @@
-#include "sieve.h"
+#include "sieve1.h"
 
 void 
 mark_primes(std::vector<bool> &is_prime, int n)
@@ -28,7 +28,7 @@ get_first_prime_multiple_after_n(long long n, long long prime)
 }
 
 long long 
-sieve(long long n) 
+sieve1(long long n) 
 {
     if (n < 2) return 0LL;
     if (n == 2) return 1LL;
