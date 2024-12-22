@@ -1,7 +1,7 @@
 # Sieve of Eratosthenes using omp
 
 ## Description
-This project implements the sieve of eratosthenes using omp library in C++ to use parallel processing. Through parallel processing, I was able to get an overall speedup on ~11 on 16 threads. The fastest implementation is done in the `src/sieve1.cpp` file.
+This project implements the sieve of eratosthenes using omp library in C++ to use parallel processing. Through parallel processing, I was able to get an overall speedup on ~10 on 16 threads. The fastest implementation is done in the `src/sieve1.cpp` file.
 
 ## Installation
 
